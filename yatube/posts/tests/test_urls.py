@@ -93,8 +93,8 @@ class PostURLTest(TestCase):
             reverse('posts:post_detail', args=[PostURLTest.post.id]):
             'posts/post_detail.html',
             reverse('posts:post_edit', args=[PostURLTest.post.id]):
-            'posts/create_post.html',
-            reverse('posts:post_create'): 'posts/create_post.html',
+            'posts/post_create.html',
+            reverse('posts:post_create'): 'posts/post_create.html',
         }
         for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
