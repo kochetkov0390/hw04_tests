@@ -13,71 +13,90 @@ class PostURLTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create(username='auth')
+        cls.test_user = User.objects.create(
+            username='test_username',
+            email='testmail@gmail.com',
+            password='Qwerty123',
+        )
         cls.group = Group.objects.create(
-            slug='Тестовый слаг'
+            title='Тестовый заголовок',
+            slug='test-group',
+            description='Тестовое описание',
         )
         cls.post = Post.objects.create(
-            author=cls.user,
+            author=cls.test_user,
             group=cls.group,
-            text='Тестовый текст'
+            text='Тестовый текст',
         )
 
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.authorized_client.force_login(self.test_user)
 
-    # Проверяем общедоступные страницы
-    def test_home_page_exists_at_correct_location(self):
-        """Главная страница доступна любому пользователю."""
-        response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    # Проверяем доступность страниц неавторизованному пользователю
+    def test_urls_for_guest_client(self):
+        """Проверка кодов ответа страниц неавторизованному пользователю."""
+        status_codes = {
+            reverse('posts:index'): HTTPStatus.OK,
+            reverse('posts:group_posts',
+                    args=[PostURLTest.group.slug]): HTTPStatus.OK,
+            reverse('posts:profile',
+                    args=[PostURLTest.test_user.username]): HTTPStatus.OK,
+            reverse('posts:post_detail',
+                    args=[PostURLTest.post.id]): HTTPStatus.OK,
+            reverse('posts:post_create'): HTTPStatus.FOUND,
+            reverse('posts:post_edit',
+                    args=[PostURLTest.post.id]): HTTPStatus.FOUND,
+        }
+        for page, status_code in status_codes.items():
+            with self.subTest(status_code=status_code):
+                response = self.guest_client.get(page)
+                self.assertEqual(response.status_code, status_code)
 
-    def test_group_page_exists_at_correct_location(self):
-        """Страница группы доступна любому пользователю."""
-        response = self.guest_client.get('/group/Тестовый слаг/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    # Проверяем доступность страниц авторизованному пользователю
+    def test_urls_for_authorized_client(self):
+        """Проверка кодов ответа страниц авторизованному пользователю."""
+        status_codes = {
+            reverse('posts:index'): HTTPStatus.OK,
+            reverse('posts:group_posts',
+                    args=[PostURLTest.group.slug]): HTTPStatus.OK,
+            reverse('posts:profile',
+                    args=[PostURLTest.test_user.username]): HTTPStatus.OK,
+            reverse('posts:post_detail',
+                    args=[PostURLTest.post.id]): HTTPStatus.OK,
+            reverse('posts:post_create'): HTTPStatus.OK,
+            reverse('posts:post_edit',
+                    args=[PostURLTest.post.id]): HTTPStatus.OK,
+        }
+        for page, status_code in status_codes.items():
+            with self.subTest(status_code=status_code):
+                response = self.authorized_client.get(page)
+                self.assertEqual(response.status_code, status_code)
 
-    def test_profile_page_exists_at_correct_location(self):
-        """Профильная страница пользователя доступна любому пользователю."""
-        response = self.guest_client.get('/profile/user/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_post_detail_page_exists_at_correct_location(self):
-        """Страница поста доступна любому пользователю."""
-        response = self.guest_client.get('/posts/1/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    # Проверяем доступность страниц для авторизованного пользователя
-    def test_post_create_page_exists_at_correct_location(self):
-        """Cоздание поста доступно только авторизованному пользователю."""
-        response = self.authorized_client.get(reverse('posts:post_create'))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_post_edit_page_exists_at_correct_location(self):
-        """Страница редактирования поста доступно только его автору."""
-        response = self.authorized_client.get('/posts/1/edit/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    # Проверка возврата ошибки 404 при обращении к несуществующей станице
+    def test_unexisting_page_returns_404(self):
+        """Несуществующая страница вернёт ошибку 404."""
+        response = self.authorized_client.get('/unexisting_page/')
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     # Проверка вызываемых шаблонов для каждого адреса
     def test_urls_use_correct_template(self):
         """URL-адрес использует корректный шаблон."""
         templates_url_names = {
-            'posts/index.html': '/',
-            'posts/group_list.html': '/group/Тестовый слаг/',
-            'posts/profile.html': '/profile/user/',
-            'posts/post_detail.html': '/posts/1/',
-            'posts/post_create.html': '/posts/1/edit/',
-            'posts/post_create.html': '/create/',
+            reverse('posts:index'): 'posts/index.html',
+            reverse('posts:group_posts', args=[PostURLTest.group.slug]):
+            'posts/group_list.html',
+            reverse('posts:profile',
+                    args=[PostURLTest.test_user.username]):
+            'posts/profile.html',
+            reverse('posts:post_detail', args=[PostURLTest.post.id]):
+            'posts/post_detail.html',
+            reverse('posts:post_edit', args=[PostURLTest.post.id]):
+            'posts/create_post.html',
+            reverse('posts:post_create'): 'posts/create_post.html',
         }
-        for template, adress in templates_url_names.items():
+        for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
                 response = self.authorized_client.get(adress)
                 self.assertTemplateUsed(response, template)
-
-    # Проверяем возврат ошибки 404 при обращении к несуществующей станице
-    def test_unexisting_page_returns_404(self):
-        """Несуществующая страница вернёт ошибку 404."""
-        response = self.guest_client.get('/unexisting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
