@@ -36,7 +36,7 @@ class PostURLTest(TestCase):
 
     def test_group_page_exists_at_correct_location(self):
         """Страница группы доступна любому пользователю."""
-        response = self.guest_client.get('/group/test-slug/')
+        response = self.guest_client.get('/group/Тестовый слаг/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_profile_page_exists_at_correct_location(self):
@@ -65,7 +65,7 @@ class PostURLTest(TestCase):
         """URL-адрес использует корректный шаблон."""
         templates_url_names = {
             'posts/index.html': '/',
-            'posts/group_list.html': '/group/test-slug/',
+            'posts/group_list.html': '/group/Тестовый слаг/',
             'posts/profile.html': '/profile/test_user/',
             'posts/post_detail.html': '/posts/1/',
             'posts/post_create.html': '/posts/1/edit/',
