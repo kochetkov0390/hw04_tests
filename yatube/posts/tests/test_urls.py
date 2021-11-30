@@ -41,7 +41,7 @@ class PostURLTest(TestCase):
 
     def test_profile_page_exists_at_correct_location(self):
         """Профильная страница пользователя доступна любому пользователю."""
-        response = self.guest_client.get('/profile/test_user/')
+        response = self.guest_client.get('/profile/user/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_detail_page_exists_at_correct_location(self):
@@ -66,7 +66,7 @@ class PostURLTest(TestCase):
         templates_url_names = {
             'posts/index.html': '/',
             'posts/group_list.html': '/group/Тестовый слаг/',
-            'posts/profile.html': '/profile/test_user/',
+            'posts/profile.html': '/profile/user/',
             'posts/post_detail.html': '/posts/1/',
             'posts/post_create.html': '/posts/1/edit/',
             'posts/post_create.html': '/create/',
