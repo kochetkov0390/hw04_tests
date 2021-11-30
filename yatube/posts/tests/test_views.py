@@ -32,7 +32,7 @@ class PostViewsTest(TestCase):
         templates_pages_names = {
             'posts/index.html': reverse('posts:index'),
             'posts/group_list.html': reverse(
-                'posts:group_posts', kwargs={'slug': 'test-slug'}),
+                'posts:group_posts', kwargs={'slug': 'Тестовый слаг'}),
             'posts/profile.html': reverse(
                 'posts:profile', kwargs={'username': self.user}),
             'posts/post_detail.html': reverse(
