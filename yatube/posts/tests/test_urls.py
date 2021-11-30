@@ -13,24 +13,20 @@ class PostURLTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.author = User.objects.create(
-            username='test_user',
-            email='testmail@gmail.com',
-            password='Qwerty123',
-        )
+        cls.user = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
-            slug='test-slug',
+            slug='Тестовый слаг'
         )
         cls.post = Post.objects.create(
-            author=cls.author,
+            author=cls.user,
             group=cls.group,
-            text='Тестовый текст',
+            text='Тестовый текст'
         )
 
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.author)
+        self.authorized_client.force_login(self.user)
 
     # Проверяем общедоступные страницы
     def test_home_page_exists_at_correct_location(self):

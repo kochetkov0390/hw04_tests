@@ -11,16 +11,12 @@ class PostViewsTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.author = User.objects.create(
-            username='test_user',
-            email='testmail@gmail.com',
-            password='Qwerty123',
-        )
+        cls.user = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
-            slug='test-slug',
+            slug='Тестовый слаг',
         )
         cls.post = Post.objects.create(
-            author=cls.author,
+            author=cls.user,
             group=cls.group,
             text='Тестовый текст',
         )
@@ -28,7 +24,7 @@ class PostViewsTest(TestCase):
     # Создаем авторизованный клиент
     def setUp(self):
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.author)
+        self.authorized_client.force_login(self.user)
 
     # Проверка используемых шаблонов
     def test_pages_use_correct_templates(self):
@@ -38,7 +34,7 @@ class PostViewsTest(TestCase):
             'posts/group_list.html': reverse(
                 'posts:group_posts', kwargs={'slug': 'test-slug'}),
             'posts/profile.html': reverse(
-                'posts:profile', kwargs={'username': self.author}),
+                'posts:profile', kwargs={'username': self.user}),
             'posts/post_detail.html': reverse(
                 'posts:post_detail', kwargs={'post_id': 1}),
             'posts/post_create.html': reverse('posts:post_create'),
@@ -61,10 +57,10 @@ class PostViewsTest(TestCase):
     # Проверка словаря контекста страницы пользователя
     def test_profile_page_shows_correct_context(self):
         """Шаблон страницы пользователя сформирован корректным контекстом."""
-        profile_url = reverse('posts:profile', kwargs={'username': self.author})
+        profile_url = reverse('posts:profile', kwargs={'username': self.user})
         response = self.authorized_client.get(profile_url)
         current_context = response.context['author']
-        expected_context = PostViewsTest.author
+        expected_context = PostViewsTest.user
         self.assertEqual(current_context, expected_context)
 
     # Проверка словаря контекста страницы публикации
@@ -79,7 +75,10 @@ class PostViewsTest(TestCase):
     # Проверка словаря контекста страницы группы
     def test_group_page_shows_correct_context(self):
         """Шаблон страницы группы сформирован корректным контекстом."""
-        group_url = reverse('posts:group_posts', kwargs={'slug': 'test-slug'})
+        group_url = reverse(
+            'posts:group_posts',
+            kwargs={'slug': 'Тестовый слаг'}
+        )
         response = self.authorized_client.get(group_url)
         current_context = response.context['group']
         expected_context = PostViewsTest.group
@@ -92,8 +91,8 @@ class PostViewsTest(TestCase):
         expected_context = self.post
         urls_pages = [
             reverse('posts:index'),
-            reverse('posts:group_posts', kwargs={'slug': 'test-slug'}),
-            reverse('posts:profile', kwargs={'username': self.author}),
+            reverse('posts:group_posts', kwargs={'slug': 'Тестовый слаг'}),
+            reverse('posts:profile', kwargs={'username': self.user}),
         ]
         for url in urls_pages:
             with self.subTest(url=url):
