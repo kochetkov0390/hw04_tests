@@ -13,14 +13,10 @@ class PostURLTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.test_user = User.objects.create(
-            username='test_username',
-            email='testmail@gmail.com',
-            password='Qwerty123',
-        )
+        cls.test_user = User.objects.create(username='auth')
         cls.group = Group.objects.create(
             title='Тестовый заголовок',
-            slug='test-group',
+            slug='Тестовый слаг',
             description='Тестовое описание',
         )
         cls.post = Post.objects.create(
@@ -34,9 +30,9 @@ class PostURLTest(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.test_user)
 
-    # Проверяем доступность страниц неавторизованному пользователю
+    # Проверка доступности страниц гостю
     def test_urls_for_guest_client(self):
-        """Проверка кодов ответа страниц неавторизованному пользователю."""
+        """Проверка кодов ответа страниц гостю."""
         status_codes = {
             reverse('posts:index'): HTTPStatus.OK,
             reverse('posts:group_posts',
@@ -54,7 +50,7 @@ class PostURLTest(TestCase):
                 response = self.guest_client.get(page)
                 self.assertEqual(response.status_code, status_code)
 
-    # Проверяем доступность страниц авторизованному пользователю
+    # Проверка доступности страниц авторизованному пользователю
     def test_urls_for_authorized_client(self):
         """Проверка кодов ответа страниц авторизованному пользователю."""
         status_codes = {
@@ -74,13 +70,13 @@ class PostURLTest(TestCase):
                 response = self.authorized_client.get(page)
                 self.assertEqual(response.status_code, status_code)
 
-    # Проверка возврата ошибки 404 при обращении к несуществующей станице
+    # Проверка возврата ошибки 404
     def test_unexisting_page_returns_404(self):
         """Несуществующая страница вернёт ошибку 404."""
         response = self.authorized_client.get('/unexisting_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
-    # Проверка вызываемых шаблонов для каждого адреса
+    # Проверка вызываемых шаблонов
     def test_urls_use_correct_template(self):
         """URL-адрес использует корректный шаблон."""
         templates_url_names = {

@@ -28,7 +28,7 @@ class PostViewsTest(TestCase):
 
     # Проверка используемых шаблонов
     def test_pages_use_correct_templates(self):
-        """URL-адрес использует корректный шаблон."""
+        """URL-адрес использует верный шаблон."""
         templates_pages_names = {
             'posts/index.html': reverse('posts:index'),
             'posts/group_list.html': reverse(
@@ -48,7 +48,7 @@ class PostViewsTest(TestCase):
 
     # Проверка словаря контекста главной страницы
     def test_index_shows_correct_context(self):
-        """Шаблон главной страницы сформирован корректным контекстом."""
+        """Шаблон главной страницы сформирован верным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
         expected_context = self.post
         current_context = response.context['page_obj'][0]
@@ -56,16 +56,16 @@ class PostViewsTest(TestCase):
 
     # Проверка словаря контекста страницы пользователя
     def test_profile_page_shows_correct_context(self):
-        """Шаблон страницы пользователя сформирован корректным контекстом."""
+        """Шаблон страницы пользователя сформирован верным контекстом."""
         profile_url = reverse('posts:profile', kwargs={'username': self.user})
         response = self.authorized_client.get(profile_url)
         current_context = response.context['author']
         expected_context = PostViewsTest.user
         self.assertEqual(current_context, expected_context)
 
-    # Проверка словаря контекста страницы публикации
+    # Проверка словаря контекста страницы поста
     def test_post_page_shows_correct_context(self):
-        """Шаблон страницы публикации сформирован корректным контекстом."""
+        """Шаблон страницы публикации сформирован верным контекстом."""
         post_url = reverse('posts:post_detail', kwargs={'post_id': 1})
         response = self.authorized_client.get(post_url)
         current_context = response.context['post']
@@ -74,7 +74,7 @@ class PostViewsTest(TestCase):
 
     # Проверка словаря контекста страницы группы
     def test_group_page_shows_correct_context(self):
-        """Шаблон страницы группы сформирован корректным контекстом."""
+        """Шаблон страницы группы сформирован верным контекстом."""
         group_url = reverse(
             'posts:group_posts',
             kwargs={'slug': 'Тестовый слаг'}
@@ -104,7 +104,7 @@ class PostViewsTest(TestCase):
     # Проверка того, что пост не попал не в свою группу
     def test_new_post_does_not_appear_in_other_group(self):
         """
-        Новый post не отображается в группе, для которой не был предназначен.
+        Новый post не отображается не в своей группе
         """
         Group.objects.create(slug='other-test-slug')
         other_url = reverse(

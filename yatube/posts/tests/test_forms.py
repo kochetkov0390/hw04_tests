@@ -23,7 +23,7 @@ class PostFormTests(TestCase):
         self.authorized_client.force_login(self.test_user)
 
     def test_post_create(self):
-        """Отправка валидной формы создаёт публикацию."""
+        """Отправка валидной формы создаёт пост."""
         posts_count = Post.objects.count()
         form_data = {
             'group': self.group.id,
@@ -43,7 +43,7 @@ class PostFormTests(TestCase):
         self.assertEqual(last_post.author, form_data['author'])
 
     def test_edit_post(self):
-        """Отправка валидной формы редактирует публикацию."""
+        """Отправка валидной формы редактирует пост."""
         post = Post.objects.create(
             group=self.group,
             text='Тестовый текст',
@@ -67,9 +67,8 @@ class PostFormTests(TestCase):
         self.assertEqual(edited_post.text, form_data['text'])
         self.assertEqual(edited_post.group.id, form_data['group'])
 
-    def test_guest_client_could_not_create_posts(self):
-        """Проверка невозможности создания поста неавторизованным
-        пользователем."""
+    def test_guest_can_create_posts(self):
+        """Проверка невозможности создания поста гостем."""
         posts_count = Post.objects.count()
         form_data = {
             'group': self.group.id,
