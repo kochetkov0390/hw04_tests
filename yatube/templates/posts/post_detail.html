@@ -36,7 +36,7 @@
           </aside>
           <article class="col-12 col-md-8">
             <p>
-              {{ post.text }}
+              {{ post.text|linebreaksbr }}
             </p>
             {% if request.user == post.author %}
               <a href="{% url 'posts:post_edit' post.id %}">

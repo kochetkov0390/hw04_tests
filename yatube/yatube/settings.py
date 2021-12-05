@@ -6,7 +6,12 @@ SECRET_KEY = 'ki3n0brf@@lole-j3gfub0o+qr_@gd4hfg-f2w^00kow%$j#w('
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    'testserver',
+]
 
 INSTALLED_APPS = [
     'about.apps.AboutConfig',
@@ -101,3 +106,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 ITEMS_PER_PAGE = 10
+
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'

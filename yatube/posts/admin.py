@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import Post, Group
 
 
+@admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('pk', 'text', 'pub_date', 'author', 'group')
     search_fields = ('text',)
@@ -11,12 +12,9 @@ class PostAdmin(admin.ModelAdmin):
     list_editable = ('group',)
 
 
+@admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ("pk", "title", "description")
-    search_fields = ("description",)
-    list_filter = ("title",)
-    empty_value_display = "-пусто-"
-
-
-admin.site.register(Post, PostAdmin)
-admin.site.register(Group, GroupAdmin)
+    list_display = ('pk', 'title', 'description')
+    search_fields = ('description',)
+    list_filter = ('title',)
+    empty_value_display = '-пусто-'

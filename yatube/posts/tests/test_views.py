@@ -96,11 +96,9 @@ class PostViewsTest(TestCase):
         profile_page = reverse('posts:profile',
                                args=[PostViewsTest.test_user.username])
         response = self.authorized_client.get(profile_page)
-        profile_post_count = response.context.get('count_user_posts')
         profile_post_title = response.context.get('title')
         profile_post = response.context['page_obj'][0]
         self.check_post_context_on_page(profile_post)
-        self.assertEqual(1, profile_post_count)
         self.assertEqual(self.post.author.username, profile_post_title)
 
     def test_group_page_uses_correct_context(self):

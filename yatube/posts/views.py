@@ -50,11 +50,9 @@ def post_create(request):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.all()
-    count_user_posts = posts.count()
     title = username
     context = {
         'author': author,
-        'count_user_posts': count_user_posts,
         'title': title,
     }
     context.update(pagination(request, posts))

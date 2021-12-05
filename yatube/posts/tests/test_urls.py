@@ -1,12 +1,7 @@
 from http import HTTPStatus
-
-from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-
-from ..models import Group, Post
-
-User = get_user_model()
+from ..models import Group, Post, User
 
 
 class PostURLTest(TestCase):
@@ -29,11 +24,7 @@ class PostURLTest(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.test_user)
-
-    # Проверка доступности страниц гостю
-    def test_urls_for_guest_client(self):
-        """Проверка кодов ответа страниц гостю."""
-        status_codes = {
+        self.status_codes = {
             reverse('posts:index'): HTTPStatus.OK,
             reverse('posts:group_posts',
                     args=[PostURLTest.group.slug]): HTTPStatus.OK,
@@ -45,12 +36,17 @@ class PostURLTest(TestCase):
             reverse('posts:post_edit',
                     args=[PostURLTest.post.id]): HTTPStatus.FOUND,
         }
-        for page, status_code in status_codes.items():
+
+    # Проверка доступности страниц гостю
+    def test_urls_for_guest_client(self):
+        """Проверка кодов ответа страниц гостю."""
+        self.status_codes
+        for page, status_code in self.status_codes.items():
             with self.subTest(status_code=status_code):
                 response = self.guest_client.get(page)
                 self.assertEqual(response.status_code, status_code)
-
     # Проверка доступности страниц авторизованному пользователю
+
     def test_urls_for_authorized_client(self):
         """Проверка кодов ответа страниц авторизованному пользователю."""
         status_codes = {
